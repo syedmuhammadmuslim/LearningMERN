@@ -1,0 +1,4 @@
+This ReactJS project is made using Vite
+Open terminal in the project directory
+run "npm install" command
+run "npm run dev"
