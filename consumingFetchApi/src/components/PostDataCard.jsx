@@ -16,6 +16,7 @@ const PostDataCard = () => {
         body: body,
       }),
       headers: {
+        // These headers are necessary for POST Requests
         "Content-type": "application/json; charset=UTF-8",
       },
     })

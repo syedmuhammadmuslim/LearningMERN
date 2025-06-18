@@ -28,7 +28,7 @@ function App() {
   return (
     <>
       <Navbar />
-      {/* <DataCard dataCardPosts={posts} /> */}
+      <DataCard dataCardPosts={posts} />
       {/* <PostDataCard /> */}
       {/* <PutDataCard /> */}
       <div className="container my-3 px-3 py-3 border border-dark">

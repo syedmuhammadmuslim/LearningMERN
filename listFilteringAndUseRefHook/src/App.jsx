@@ -14,14 +14,14 @@ function App() {
 
   return (
     <>
-      {/* <ListFilteringAndSearching /> */}
-      {/* {ListFilteringAndSearching()} */}
-      {/* <FocusInput /> */}
-      {/* <ScrollToDiv /> */}
-      {/* <ScrollToDiv2 /> */}
-      {/* <ChangeStyle /> */}
-      {/* <ChangeStyle2 /> */}
-      {/* <ToggleVisibility /> */}
+      <ListFilteringAndSearching />
+      {ListFilteringAndSearching()}
+      <FocusInput />
+      <ScrollToDiv />
+      <ScrollToDiv2 />
+      <ChangeStyle />
+      <ChangeStyle2 />
+      <ToggleVisibility />
       <StudentList />
     </>
   );
