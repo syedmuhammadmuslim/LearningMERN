@@ -13,7 +13,7 @@ function ProductsList() {
       <ul className="list-group">
         {products.map((item) => (
           <li key={item.id} className="list-group-item">
-            <Link to={`${item.id}`}>{item.name}</Link>
+            <Link to={item.id}>{item.name}</Link>
           </li>
         ))}
       </ul>

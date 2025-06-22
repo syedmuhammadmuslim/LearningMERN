@@ -1,4 +1,5 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { use } from "react";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 
 const ProductDetails = () => {
   // extract productId from URL
@@ -23,10 +24,11 @@ const ProductDetails = () => {
       </p>
       <Link
         to="/products"
-        // onClick={(e) => {
-        //   e.preventDefault();
-        //   navigate(-1);
-        // }}
+        onClick={(e) => {
+          // <Navigate to="/products" />;
+          navigate(-1);
+          // navigate("/products");
+        }}
       >
         Back to Product List
       </Link>
@@ -35,3 +37,8 @@ const ProductDetails = () => {
 };
 
 export default ProductDetails;
+
+// onClick={(e) => {
+//   e.preventDefault();
+//   navigate(-1);
+// }}
