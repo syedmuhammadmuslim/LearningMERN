@@ -4,9 +4,14 @@ import express from "express";
 import { body, param, validationResult } from "express-validator";
 import userRoutes from "./routes/userRoutes.js";
 import helmet from "helmet";
+// import { configDotenv } from "dotenv";
+// configDotenv();
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT;
+const myPassword = process.env.myPassword;
 
 let users = [
   { id: "1", name: "Muhammad" },
