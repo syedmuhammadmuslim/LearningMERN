@@ -1,6 +1,10 @@
 // const express = require("express");
+// The imports below work only because we have added the property "type:module" in the package.json. Now we cannot use require('moduleName') type of import.
 import express from "express";
 import { body, param, validationResult } from "express-validator";
+import userRoutes from "./routes/userRoutes.js";
+import helmet from "helmet";
+
 const app = express();
 const PORT = 3000;
 
@@ -10,6 +14,7 @@ let users = [
 ];
 
 app.use(express.json());
+app.use(helmet());
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
@@ -21,17 +26,19 @@ app.get("/", (req, res) => {
   );
 });
 
-app.get("/users", (req, res) => {
-  //   res.send("All the users will be listed on this page.");
-  res.json(users);
-});
+// app.get("/users", (req, res) => {
+//   //   res.send("All the users will be listed on this page.");
+//   res.json(users);
+// });
 
-app.get("/users/:id", (req, res) => {
-  // res.send(`User ID is ${req.params.id}`);
-  const user = users.find((user) => user.id === req.params.id);
-  if (!user) return res.status(404).send("User not found");
-  res.json(user);
-});
+// app.get("/users/:id", (req, res) => {
+//   // res.send(`User ID is ${req.params.id}`);
+//   const user = users.find((user) => user.id === req.params.id);
+//   if (!user) return res.status(404).send("User not found");
+//   res.json(user);
+// });
+
+app.use("/users", userRoutes);
 
 app.get("/search", (req, res) => {
   const { q } = req.query;
@@ -63,3 +70,7 @@ app.post("/users", nameValidator, (req, res) => {
   users.push(newUser);
   res.status(201).json(newUser);
 });
+
+// app.get("/ab\\+cd", (req, res) => {
+//   res.send("ab+cd");
+// });
