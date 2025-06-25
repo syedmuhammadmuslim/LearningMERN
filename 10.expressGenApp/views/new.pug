@@ -1,0 +1,19 @@
+extends layout
+
+block content
+  h1= title
+  form(method="post", action="/blogs/new")
+    div
+      label(for="title") Title:
+      input(type="text", name="title")
+    div
+      label(for="content") Content:
+      textarea(name="content")
+    div
+      button(type="submit") Add Post
+    br
+    a(href="/") Go to home page
+    br
+    a(href="/about") Go to about page
+    br
+    a(href="/blogs") Go to blogs page
