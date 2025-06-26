@@ -10,6 +10,8 @@ const posts = [
   { id: 3, title: "Title 3", content: "Content 3" },
 ];
 
+// const posts = null;
+
 app.use(express.json());
 app.use(cors());
 

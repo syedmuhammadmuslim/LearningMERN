@@ -3,21 +3,30 @@ import { useEffect, useState } from "react";
 function App() {
   const [posts, setPosts] = useState();
 
+  // useEffect(() => {
+  //   fetch("http://localhost:3000/")
+  //     .then((response) => {
+  //       return response.json();
+  //     })
+  //     .then((data) => {
+  //       setPosts(data);
+  //       return data;
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }, []);
+
   useEffect(() => {
-    const fetchData = () => {
-      fetch("http://localhost:3000/")
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          setPosts(data);
-          return data;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    const fetchData = async () => {
+      const response = await fetch("http://localhost:3000/");
+      const data = await response.json();
+      setPosts(data);
+      console.log(data);
+      return data;
     };
-    fetchData();
+    const data = fetchData();
+    console.log(data);
   }, []);
 
   return (
@@ -26,7 +35,7 @@ function App() {
         {posts ? (
           posts.map((post) => (
             <li key={post.id} className="list-group-item">
-              {post.content}
+              {post.title} - {post.content}
             </li>
           ))
         ) : (
