@@ -3,5 +3,3 @@
 
 # Ignore all .env files
 **/.env
-
-/12.mongoAtlasApp
