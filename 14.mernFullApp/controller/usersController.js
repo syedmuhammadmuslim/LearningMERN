@@ -3,28 +3,55 @@ import { usersModel } from "../models/usersModel.js";
 export const createUser = async (req, res) => {
   try {
     const result = await usersModel.create(req.body);
-    return res.status(200).json(result);
+    res.status(200).json(result);
   } catch (err) {
-    return res.status(400).send(err.message);
+    res.status(400).send(err.message);
   }
 };
 
 export const getAllUsers = async (req, res) => {
   try {
-    const result = await usersModel.find();
-    return res.status(200).json(result);
+    const result = await usersModel
+      .find(req.filter)
+      .sort({ [req.sortBy]: req.orderBy });
+    res.status(200).json(result);
   } catch (err) {
-    return res.status(400).send(err.message);
+    res.status(400).send(err.message);
   }
 };
 
 export const getUserById = async (req, res) => {
   try {
     const result = await usersModel.findById(req.params.id);
-    return result
+    result
       ? res.status(200).json(result)
       : res.status(400).send("No such user in the DB");
   } catch (err) {
-    return res.status(400).send(err.message);
+    res.status(400).send(err.message);
+  }
+};
+
+export const updateUser = async (req, res) => {
+  try {
+    const result = await usersModel.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    result
+      ? res.status(200).json(result)
+      : res.status(400).send("No such user in the DB");
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+export const deleteUser = async (req, res) => {
+  try {
+    const result = await usersModel.findByIdAndDelete(req.params.id);
+    result
+      ? res.status(200).json(result)
+      : res.status(400).send("No such user in the DB");
+  } catch (err) {
+    res.status(400).send(err.message);
   }
 };
