@@ -18,7 +18,7 @@ export const allUsersQueryParamsValidator = (req, res, next) => {
   } else {
     req.filter = { age: { $gte: value.minAge } };
     req.sortBy = value.sortBy;
-    req.orderBy = value.order === "asc" ? 1 : -1;
+    req.order = value.order === "asc" ? 1 : -1;
     next();
   }
 };

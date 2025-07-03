@@ -13,7 +13,7 @@ export const getAllUsers = async (req, res) => {
   try {
     const result = await usersModel
       .find(req.filter)
-      .sort({ [req.sortBy]: req.orderBy });
+      .sort({ [req.sortBy]: req.order });
     res.status(200).json(result);
   } catch (err) {
     res.status(400).send(err.message);

@@ -16,9 +16,9 @@ const usersRouter = express.Router();
 
 usersRouter
   .get("/", usersAuthenticator, allUsersQueryParamsValidator, getAllUsers)
-  .get("/:id", getUserById)
-  .post("/", createUser)
-  .put("/:id", updateUser)
-  .delete("/:id", deleteUser);
+  .get("/:id", usersAuthenticator, getUserById)
+  .post("/", usersAuthenticator, createUser)
+  .put("/:id", usersAuthenticator, updateUser)
+  .delete("/:id", usersAuthenticator, deleteUser);
 
 export default usersRouter;
