@@ -1,8 +1,22 @@
 import joi from "joi";
+import jwt from "jsonwebtoken";
+import { usersModel } from "../models/usersModel.js";
 
-export const usersAuthenticator = (req, res, next) => {
+export const usersAuthenticator = async (req, res, next) => {
   const token = req.headers.authorization;
-  token === "HSMM" ? next() : res.status(401).send("Unauthorized");
+  if (!token) {
+    res.status(400).json({ error: "Unauthorized" });
+  } else {
+    try {
+      const decodedUser = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await usersModel.findById(decodedUser.id).select("-password");
+      console.log(decodedUser);
+      next();
+    } catch (err) {
+      console.log("This block has caught an error");
+      res.status(400).json({ error: err.message });
+    }
+  }
 };
 
 export const allUsersQueryParamsValidator = (req, res, next) => {

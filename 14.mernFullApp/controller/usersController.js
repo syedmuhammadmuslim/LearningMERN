@@ -1,14 +1,5 @@
 import { usersModel } from "../models/usersModel.js";
 
-export const createUser = async (req, res) => {
-  try {
-    const result = await usersModel.create(req.body);
-    res.status(200).json(result);
-  } catch (err) {
-    res.status(400).send(err.message);
-  }
-};
-
 export const getAllUsers = async (req, res) => {
   try {
     const result = await usersModel

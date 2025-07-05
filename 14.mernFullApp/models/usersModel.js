@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 const usersSchema = new mongoose.Schema(
   {
@@ -10,6 +11,7 @@ const usersSchema = new mongoose.Schema(
     email: {
       type: String,
       required: [true, "Email is required"],
+      unique: true,
       match: [/^\S+@\S+\.\S+$/, "Email is invalid"],
     },
     age: {
@@ -17,8 +19,30 @@ const usersSchema = new mongoose.Schema(
       min: [0, "Age must be positive"],
       default: 18,
     },
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+      match: [
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\]:;"'<>,.?/-]).{8,}$/,
+        "Password must contain at least an uppercase, a lowercase, a special character, and a number",
+      ],
+    },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
   },
   { timestamps: true }
 );
+
+usersSchema.pre("save", async function () {
+  // if (!this.isModified("password")) return;
+  this.password = await bcrypt.hash(this.password, 10);
+});
+
+usersSchema.methods.matchPassword = async function (submittedPassword) {
+  return await bcrypt.compare(submittedPassword, this.password);
+};
 
 export const usersModel = mongoose.model("users", usersSchema);

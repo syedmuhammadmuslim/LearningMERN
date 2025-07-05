@@ -1,7 +1,6 @@
 import express from "express";
 
 import {
-  createUser,
   getAllUsers,
   getUserById,
   updateUser,
@@ -17,7 +16,6 @@ const usersRouter = express.Router();
 usersRouter
   .get("/", usersAuthenticator, allUsersQueryParamsValidator, getAllUsers)
   .get("/:id", usersAuthenticator, getUserById)
-  .post("/", usersAuthenticator, createUser)
   .put("/:id", usersAuthenticator, updateUser)
   .delete("/:id", usersAuthenticator, deleteUser);
 

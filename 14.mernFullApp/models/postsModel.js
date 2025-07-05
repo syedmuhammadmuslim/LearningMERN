@@ -9,9 +9,9 @@ const postsSchema = new mongoose.Schema(
       ref: "users",
       required: [true, "A post must be created by a user"],
     },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
     parentPost: { type: mongoose.Schema.Types.ObjectId, ref: "posts" },
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "posts" }],
-    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
   },
   { timestamps: true }
 );

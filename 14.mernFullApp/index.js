@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import usersRouter from "./routers/usersRouter.js";
 import postsRouter from "./routers/postsRouter.js";
+import authRouter from "./routers/authRouter.js";
 
 dotenv.config();
 const app = express();
@@ -10,6 +11,7 @@ const app = express();
 app.use(express.json());
 app.use("/api/users", usersRouter);
 app.use("/api/posts", postsRouter);
+app.use("/api/auth", authRouter);
 
 mongoose
   .connect(process.env.MONGO_URI, { dbName: process.env.DB_NAME })
