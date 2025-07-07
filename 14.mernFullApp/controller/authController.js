@@ -10,6 +10,7 @@ const generateToken = (user) => {
   const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, {
     expiresIn: "7d",
   });
+  console.log(token);
   return token;
 };
 
