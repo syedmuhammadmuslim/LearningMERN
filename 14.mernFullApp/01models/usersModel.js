@@ -22,22 +22,35 @@ const usersSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Password is required"],
-      match: [
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\]:;"'<>,.?/-]).{8,}$/,
-        "Password must contain at least an uppercase, a lowercase, a special character, and a number",
-      ],
+      // match: [
+      //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\]:;"'<>,.?/-]).{8,}$/,
+      //   "Password must contain at least an uppercase, a lowercase, a special character, and a number",
+      // ],
     },
     role: {
       type: String,
       enum: ["user", "admin"],
       default: "user",
     },
+    permissions: {
+      type: [String],
+      default: [
+        "create:posts",
+        "read:posts",
+        "update:posts",
+        "delete:posts",
+        "create:comments",
+        "read:comments",
+        "update:comments",
+        "delete:comments",
+      ],
+    },
   },
   { timestamps: true }
 );
 
 usersSchema.pre("save", async function () {
-  // if (!this.isModified("password")) return;
+  if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, 10);
 });
 
@@ -45,4 +58,4 @@ usersSchema.methods.matchPassword = async function (submittedPassword) {
   return await bcrypt.compare(submittedPassword, this.password);
 };
 
-export const usersModel = mongoose.model("users", usersSchema);
+export default mongoose.model("users", usersSchema);

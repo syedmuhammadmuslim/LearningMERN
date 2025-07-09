@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 export const Navbar = () => {
   return (
     <div>
+      {console.log(localStorage.getItem("userToken"))}
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <Link className="navbar-brand" to="/">
           HSMM Stack Overflow

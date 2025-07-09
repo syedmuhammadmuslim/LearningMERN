@@ -1,4 +1,4 @@
-import { usersModel } from "../models/usersModel.js";
+import usersModel  from "../01models/usersModel.js";
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -46,3 +46,7 @@ export const deleteUser = async (req, res) => {
     res.status(400).send(err.message);
   }
 };
+
+const usersController = { getAllUsers, getUserById, updateUser, deleteUser };
+
+export default usersController;

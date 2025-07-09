@@ -18,7 +18,10 @@ export const Login = () => {
       },
     })
       .then((response) => response.json())
-      .then((json) => alert(JSON.stringify(json)));
+      .then((json) => {
+        localStorage.setItem("userToken", json.token);
+        console.log(localStorage.getItem("userToken"));
+      });
   };
   return (
     <div className="d-flex justify-content-center">

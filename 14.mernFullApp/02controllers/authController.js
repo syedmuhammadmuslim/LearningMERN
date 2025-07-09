@@ -1,4 +1,4 @@
-import { usersModel } from "../models/usersModel.js";
+import usersModel from "../01models/usersModel.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
@@ -16,14 +16,14 @@ const generateToken = (user) => {
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, age, password, role, permissions } = req.body;
     const exists = await usersModel.findOne({ email });
     if (exists) {
       res
         .status(400)
         .json({ message: "User with this email address aleardy exists" });
     } else {
-      const user = await usersModel.create({ name, email, password });
+      const user = await usersModel.create({ name, email, age, password, role, permissions });
       res.status(201).json({
         user: { id: user._id, name: user.name },
         token: generateToken(user),
