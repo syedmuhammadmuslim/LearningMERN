@@ -8,7 +8,6 @@ export const usersAuthenticator = async (req, res, next) => {
   } else {
     try {
       const decodedUser = jwt.verify(token, process.env.JWT_SECRET);
-      console.log(decodedUser);
       req.user = await usersModel.findById(decodedUser.id).select("-password");
       next();
     } catch (err) {

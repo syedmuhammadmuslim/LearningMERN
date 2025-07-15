@@ -13,7 +13,7 @@ usersRouter
   .get(
     "/",
     usersAuthenticator,
-    authorize("read:users"),
+    // authorize("read:users"),
     allUsersQueryParamsValidator,
     usersController.getAllUsers
   )
