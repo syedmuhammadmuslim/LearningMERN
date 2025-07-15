@@ -10,7 +10,6 @@ const generateToken = (user) => {
   const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, {
     expiresIn: "7d",
   });
-  console.log(token);
   return token;
 };
 
@@ -23,7 +22,14 @@ export const registerUser = async (req, res) => {
         .status(400)
         .json({ message: "User with this email address aleardy exists" });
     } else {
-      const user = await usersModel.create({ name, email, age, password, role, permissions });
+      const user = await usersModel.create({
+        name,
+        email,
+        age,
+        password,
+        role,
+        permissions,
+      });
       res.status(201).json({
         user: { id: user._id, name: user.name },
         token: generateToken(user),
@@ -39,7 +45,6 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await usersModel.findOne({ email });
     if (user && (await user.matchPassword(password))) {
-      console.log(user.matchPassword(password));
       res.status(200).json({
         user: { id: user._id, name: user.name },
         message: "Login successful",

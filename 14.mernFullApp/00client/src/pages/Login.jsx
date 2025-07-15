@@ -1,12 +1,18 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../stateManagement/usersSlice";
+import { useNavigate, Navigate } from "react-router-dom";
 
 export const Login = () => {
+  const loggedIn = useSelector((state) => state.usersReducer.loggedIn);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const login = (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
-    console.log("Submitted");
     fetch("http://localhost:3000/api/auth/login", {
       method: "POST",
       body: JSON.stringify({
@@ -20,12 +26,15 @@ export const Login = () => {
       .then((response) => response.json())
       .then((json) => {
         localStorage.setItem("userToken", json.token);
-        console.log(localStorage.getItem("userToken"));
+        dispatch(login());
+        navigate("/");
       });
   };
-  return (
+  return loggedIn ? (
+    <Navigate to="/" replace />
+  ) : (
     <div className="d-flex justify-content-center">
-      <form onSubmit={login}>
+      <form onSubmit={handleLogin}>
         <div className="container mt-3 row">
           <div className="form-group col-6">
             <label className="ms-2" htmlFor="regFormEmail">

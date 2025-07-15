@@ -1,26 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { fetchUsers } from "../stateManagement/usersSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export const GetAllUSers = () => {
-  const [allUsers, setAllUsers] = useState([]);
+  const dispatch = useDispatch();
+  const { users, loading, error } = useSelector((store) => store.usersReducer);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/users", {
-      method: "GET",
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-        authorization: localStorage.getItem("userToken"),
-      },
-    })
-      .then((response) => response.json())
-      .then((json) => {
-        setAllUsers(json);
-      });
-  }, []);
+    dispatch(fetchUsers());
+  }, [dispatch]);
+
+  if (loading) return <div className="alert alert-info">Loading...</div>;
+  if (error) return <div className="alert alert-danger">{error}</div>;
+
   return (
     <div>
-      <ul className="lis-group">
-        {allUsers.length > 0 ? (
-          allUsers.map((user) => {
+      <ul className="list-group">
+        {users.length > 0 ? (
+          users.map((user) => {
             return (
               <li key={user._id} className="list-group-item">
                 {user.name}
@@ -28,7 +25,7 @@ export const GetAllUSers = () => {
             );
           })
         ) : (
-          <li className="list-group-item">Unauthorized</li>
+          <li className="alert alert-danger">Unauthorized</li>
         )}
       </ul>
     </div>

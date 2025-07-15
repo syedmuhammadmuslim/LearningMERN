@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
 
 export const Register = () => {
   const [name, setName] = useState("");
@@ -23,7 +25,9 @@ export const Register = () => {
       .then((response) => response.json())
       .then((json) => alert(JSON.stringify(json)));
   };
-  return (
+  return useSelector((state) => state.usersReducer.loggedIn) ? (
+    <Navigate to="/" replace />
+  ) : (
     <div className="d-flex justify-content-center">
       <form onSubmit={registerUser}>
         <div className="container mt-3 row">

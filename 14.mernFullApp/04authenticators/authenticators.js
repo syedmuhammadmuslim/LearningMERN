@@ -2,7 +2,8 @@ import jwt from "jsonwebtoken";
 import usersModel from "../01models/usersModel.js";
 
 export const usersAuthenticator = async (req, res, next) => {
-  const token = req.headers.authorization;
+  // const token = req.headers.authorization;
+  const token = req.headers.authorization?.split(" ")[1]; //bearer token
   if (!token) {
     res.status(400).json({ error: "Unauthorized - No auth token provided" });
   } else {

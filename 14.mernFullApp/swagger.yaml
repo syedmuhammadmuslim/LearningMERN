@@ -1,0 +1,42 @@
+openapi: 3.0.0
+info:
+  title: User API
+  version: 1.0.0
+paths:
+  /api/users:
+    get:
+      summary: Get all users
+      responses:
+        "200":
+          description: A list of users
+  /api/posts:
+    get:
+      summary: Get all posts
+      responses:
+        "200":
+          description: A list of posts
+    post:
+      summary: Create a new post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                author:
+                  type: string
+      responses:
+        "200":
+          description: The created post
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []

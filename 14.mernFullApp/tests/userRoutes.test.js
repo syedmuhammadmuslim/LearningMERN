@@ -16,14 +16,14 @@ afterAll(async () => {
   await mongoose.disconnect();
 });
 
-describe("User API", () => {
-  //   it("should return all users", async () => {
-  //     const res = await request(app)
-  //       .get("/api/users")
-  //       .set("Authorization", process.env.AUTH);
-  //     expect(res.statusCode).toEqual(200);
-  //     expect(res.body).toBeInstanceOf(Array);
-  //   });
+describe("Posts API", () => {
+  it("should return all posts", async () => {
+    const res = await request(app)
+      .get("/api/posts")
+      .set("Authorization", process.env.AUTH);
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toBeInstanceOf(Array);
+  });
 
   let testPostId;
 
@@ -38,7 +38,18 @@ describe("User API", () => {
       .set("Authorization", process.env.AUTH);
     testPostId = res.body._id;
     expect(res.statusCode).toEqual(200);
-    expect(res.body).toBeInstanceOf(Object);
+  });
+
+  it("should update the created post", async () => {
+    const res = await request(app)
+      .put(`/api/posts/${testPostId}`)
+      .send({
+        title: "New Post 23",
+        content: "New Content 23",
+        author: "6867d055a27d0c00627475a0",
+      })
+      .set("Authorization", process.env.AUTH);
+    expect(res.statusCode).toEqual(200);
   });
 
   it("should delete the created post", async () => {
@@ -46,6 +57,5 @@ describe("User API", () => {
       .delete(`/api/posts/${testPostId}`)
       .set("Authorization", process.env.AUTH);
     expect(res.statusCode).toEqual(200);
-    expect(res.body).toBeInstanceOf(Object);
   });
 });

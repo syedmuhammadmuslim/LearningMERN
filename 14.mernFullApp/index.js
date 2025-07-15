@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import app from "./app.js";
+import swaggerUi from "swagger-ui-express";
+import YAML from "yamljs";
+
+const swaggerDoc = YAML.load("./swagger.yaml");
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
 dotenv.config();
 
