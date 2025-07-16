@@ -1,18 +1,23 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import { Navigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { Navigate, useNavigate } from "react-router-dom";
+import { addProfile } from "../stateManagement/profileSlice";
 
 export const Register = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [age, setAge] = useState("");
+  const loggedIn = !!useSelector((state) => state.profileReducer.user._id);
 
   const registerUser = (e) => {
     e.preventDefault();
     console.log("Submitted");
     fetch("http://localhost:3000/api/auth/register", {
       method: "POST",
+      credentials: "include",
       body: JSON.stringify({
         name: name,
         email: email,
@@ -23,9 +28,12 @@ export const Register = () => {
       },
     })
       .then((response) => response.json())
-      .then((json) => alert(JSON.stringify(json)));
+      .then((json) => {
+        dispatch(addProfile(json.user));
+        navigate("/");
+      });
   };
-  return useSelector((state) => state.usersReducer.loggedIn) ? (
+  return loggedIn ? (
     <Navigate to="/" replace />
   ) : (
     <div className="d-flex justify-content-center">

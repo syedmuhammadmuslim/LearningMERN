@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { fetchUsers } from "../stateManagement/usersSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-export const GetAllUSers = () => {
+export const GetAllUsers = () => {
   const dispatch = useDispatch();
   const { users, loading, error } = useSelector((store) => store.usersReducer);
 

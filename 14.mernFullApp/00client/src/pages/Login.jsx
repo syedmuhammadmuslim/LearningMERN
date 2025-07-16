@@ -1,20 +1,20 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../stateManagement/usersSlice";
 import { useNavigate, Navigate } from "react-router-dom";
+import { addProfile } from "../stateManagement/profileSlice";
 
 export const Login = () => {
-  const loggedIn = useSelector((state) => state.usersReducer.loggedIn);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const loggedIn = !!useSelector((state) => state.profileReducer.user._id);
 
   const handleLogin = (e) => {
     e.preventDefault();
     fetch("http://localhost:3000/api/auth/login", {
       method: "POST",
+      credentials: "include",
       body: JSON.stringify({
         email: email,
         password: password,
@@ -25,8 +25,7 @@ export const Login = () => {
     })
       .then((response) => response.json())
       .then((json) => {
-        localStorage.setItem("userToken", json.token);
-        dispatch(login());
+        dispatch(addProfile(json.user));
         navigate("/");
       });
   };

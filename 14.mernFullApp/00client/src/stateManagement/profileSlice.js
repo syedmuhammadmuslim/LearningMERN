@@ -1,10 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-export const fetchUsers = createAsyncThunk(
-  "users/fetch",
+export const fetchProfile = createAsyncThunk(
+  "profile/fetch",
   async (_, thunkAPI) => {
     try {
-      const res = await fetch("http://localhost:3000/api/users", {
+      const res = await fetch("http://localhost:3000/api/auth", {
         method: "GET",
         credentials: "include",
         headers: {
@@ -21,29 +21,34 @@ export const fetchUsers = createAsyncThunk(
   }
 );
 
-const usersSlice = createSlice({
-  name: "usersSlice",
+const profileSlice = createSlice({
+  name: "profileSlice",
   initialState: {
-    users: [],
+    user: "",
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    addProfile(state, action) {
+      state.user = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUsers.pending, (state /*, action*/) => {
+      .addCase(fetchProfile.pending, (state /*, action*/) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchUsers.fulfilled, (state, action) => {
+      .addCase(fetchProfile.fulfilled, (state, action) => {
         state.loading = false;
-        state.users = action.payload;
+        state.user = action.payload;
       })
-      .addCase(fetchUsers.rejected, (state, action) => {
+      .addCase(fetchProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to fetch users";
       });
   },
 });
 
-export default usersSlice.reducer;
+export const { addProfile } = profileSlice.actions;
+export default profileSlice.reducer;

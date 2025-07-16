@@ -12,13 +12,16 @@
   "description": "",
   "dependencies": {
     "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.0.0",
     "express": "^5.1.0",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.1",
+    "morgan": "^1.10.0",
     "swagger-ui-express": "^5.0.1",
+    "winston": "^3.17.0",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {

@@ -1,15 +1,27 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../stateManagement/usersSlice";
+import { Link } from "react-router-dom";
+import { addProfile, fetchProfile } from "../stateManagement/profileSlice";
 
 export const Navbar = () => {
   const dispatch = useDispatch();
-  const { loggedIn } = useSelector((store) => store.usersReducer);
+  useEffect(() => {
+    dispatch(fetchProfile());
+  }, [dispatch]);
+  const { user, loading, error } = useSelector((store) => store.profileReducer);
+  const loggedIn = !!user._id;
+
+  if (loading) return <div className="alert alert-info">Loading...</div>;
+  if (error) return <div className="alert alert-danger">{error}</div>;
   const handleLogout = (e) => {
     e.preventDefault();
-    localStorage.removeItem("userToken");
-    dispatch(logout());
+    fetch("http://localhost:3000/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    }).then((response) => {
+      dispatch(addProfile(""));
+      return response.json();
+    });
   };
   return (
     <div>
