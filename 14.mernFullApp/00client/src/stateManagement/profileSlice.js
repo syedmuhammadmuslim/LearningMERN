@@ -1,10 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { API_BASE_URL } from "../../api/config";
 
 export const fetchProfile = createAsyncThunk(
   "profile/fetch",
   async (_, thunkAPI) => {
     try {
-      const res = await fetch("http://localhost:3000/api/auth", {
+      const res = await fetch(`${API_BASE_URL}/auth`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -24,13 +25,13 @@ export const fetchProfile = createAsyncThunk(
 const profileSlice = createSlice({
   name: "profileSlice",
   initialState: {
-    user: "",
-    loading: false,
+    user: {},
+    loading: true,
     error: null,
   },
   reducers: {
     addProfile(state, action) {
-      state.user = action.payload;
+      state.user = action.payload || {};
     },
   },
   extraReducers: (builder) => {

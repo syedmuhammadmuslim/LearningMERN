@@ -1,10 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { API_BASE_URL } from "../../api/config";
 
 export const fetchUsers = createAsyncThunk(
   "users/fetch",
   async (_, thunkAPI) => {
     try {
-      const res = await fetch("http://localhost:3000/api/users", {
+      const res = await fetch(`${API_BASE_URL}/users`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -25,7 +26,7 @@ const usersSlice = createSlice({
   name: "usersSlice",
   initialState: {
     users: [],
-    loading: false,
+    loading: true,
     error: null,
   },
   reducers: {},

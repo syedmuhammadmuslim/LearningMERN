@@ -34,7 +34,7 @@ export const registerUser = async (req, res) => {
         .cookie("token", generateToken(user), {
           httpOnly: true,
           secure: false, // set to true in production with HTTPS
-          sameSite: "lax",
+          sameSite: "Strict",
           maxAge: 60 * 60 * 1000, // 1 hour
         })
         .status(201)
@@ -62,7 +62,7 @@ export const login = async (req, res) => {
         .cookie("token", generateToken(user), {
           httpOnly: true,
           secure: false, // set to true in production with HTTPS
-          sameSite: "lax",
+          sameSite: "Strict",
           maxAge: 60 * 60 * 1000, // 1 hour
         })
         .status(200)

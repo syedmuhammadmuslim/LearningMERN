@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
 import { addProfile } from "../stateManagement/profileSlice";
+import { API_BASE_URL } from "../../api/config";
 
 export const Register = () => {
   const dispatch = useDispatch();
@@ -10,12 +11,13 @@ export const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [age, setAge] = useState("");
-  const loggedIn = !!useSelector((state) => state.profileReducer.user._id);
-
+  const { user, loading } = useSelector((state) => state.profileReducer);
+  if (loading) return <div className="alert alert-info">Loading...</div>;
+  const loggedIn = !!user._id;
   const registerUser = (e) => {
     e.preventDefault();
     console.log("Submitted");
-    fetch("http://localhost:3000/api/auth/register", {
+    fetch(`${API_BASE_URL}/auth/register`, {
       method: "POST",
       credentials: "include",
       body: JSON.stringify({
@@ -30,6 +32,10 @@ export const Register = () => {
       .then((response) => response.json())
       .then((json) => {
         dispatch(addProfile(json.user));
+        navigate("/");
+      })
+      .catch((err) => {
+        console.log(err);
         navigate("/");
       });
   };

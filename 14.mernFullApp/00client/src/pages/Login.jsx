@@ -2,17 +2,19 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Navigate } from "react-router-dom";
 import { addProfile } from "../stateManagement/profileSlice";
+import { API_BASE_URL } from "../../api/config";
 
 export const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const loggedIn = !!useSelector((state) => state.profileReducer.user._id);
-
+  const { user, loading } = useSelector((state) => state.profileReducer);
+  if (loading) return <div className="alert alert-info">Loading...</div>;
+  const loggedIn = !!user._id;
   const handleLogin = (e) => {
     e.preventDefault();
-    fetch("http://localhost:3000/api/auth/login", {
+    fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
       credentials: "include",
       body: JSON.stringify({
@@ -26,6 +28,10 @@ export const Login = () => {
       .then((response) => response.json())
       .then((json) => {
         dispatch(addProfile(json.user));
+        navigate("/");
+      })
+      .catch((err) => {
+        console.log(err);
         navigate("/");
       });
   };

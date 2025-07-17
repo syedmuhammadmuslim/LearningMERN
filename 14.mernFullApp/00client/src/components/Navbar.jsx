@@ -2,25 +2,27 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { addProfile, fetchProfile } from "../stateManagement/profileSlice";
+import { API_BASE_URL } from "../../api/config.js";
 
 export const Navbar = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchProfile());
   }, [dispatch]);
-  const { user, loading, error } = useSelector((store) => store.profileReducer);
+  const { user, loading } = useSelector((store) => store.profileReducer);
   const loggedIn = !!user._id;
 
-  if (loading) return <div className="alert alert-info">Loading...</div>;
-  if (error) return <div className="alert alert-danger">{error}</div>;
+  if (loading) {
+    return <div className="alert alert-info">Loading...</div>;
+  }
   const handleLogout = (e) => {
     e.preventDefault();
-    fetch("http://localhost:3000/api/auth/logout", {
+    fetch(`${API_BASE_URL}/auth/logout`, {
       method: "POST",
       credentials: "include",
-    }).then((response) => {
-      dispatch(addProfile(""));
-      return response.json();
+    }).then(() => {
+      dispatch(addProfile({}));
+      return;
     });
   };
   return (
