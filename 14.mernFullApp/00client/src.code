@@ -1,0 +1,560 @@
+// ./api/config.js
+export const API_BASE_URL = import.meta.env.API_BASE_URL || "http://localhost:3000/api";
+
+
+
+// ./components/GetAllUsers.jsx
+import React, { useEffect } from "react";
+import { fetchUsers } from "../stateManagement/usersSlice";
+import { useDispatch, useSelector } from "react-redux";
+import DOMPurify from "dompurify";
+
+export const GetAllUsers = () => {
+  const dispatch = useDispatch();
+  const { users, loading, error } = useSelector((store) => store.usersReducer);
+
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, [dispatch]);
+
+  if (loading) return <div className="alert alert-info">Loading...</div>;
+  if (error) return <div className="alert alert-danger">{error}</div>;
+
+  return (
+    <div>
+      <ul className="list-group">
+        {users.length > 0 ? (
+          users.map((user) => {
+            return (
+              <li key={user._id} className="list-group-item">
+                {DOMPurify.sanitize(user.name)}
+              </li>
+            );
+          })
+        ) : (
+          <li className="alert alert-danger">Unauthorized</li>
+        )}
+      </ul>
+    </div>
+  );
+};
+
+
+// ./components/Navbar.jsx
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { addProfile, fetchProfile } from "../stateManagement/profileSlice";
+import { API_BASE_URL } from "../api/config.js";
+
+export const Navbar = () => {
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { user, loading } = useSelector((store) => store.profileReducer);
+  const loggedIn = !!user._id;
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const controller = new AbortController();
+    dispatch(fetchProfile({ signal: controller.signal }));
+    return () => controller.abort();
+  }, [dispatch]);
+
+  if (loading) {
+    return <div className="alert alert-info">Loading...</div>;
+  }
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    setIsLoggingOut(true);
+    fetch(`${API_BASE_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Logout failed");
+        }
+        dispatch(addProfile({}));
+        navigate("/");
+      })
+      .catch((err) => {
+        console.log(err);
+        alert(err.message);
+      })
+      .finally(() => setIsLoggingOut(false));
+  };
+  return (
+    <div>
+      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+        <Link className="navbar-brand" to="/">
+          HSMM Stack Overflow
+        </Link>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div
+          className="collapse navbar-collapse justify-content-between"
+          id="navbarNav"
+        >
+          <ul className="navbar-nav">
+            <li className="nav-item active">
+              <Link className="nav-link" to="/">
+                Home
+              </Link>
+            </li>
+          </ul>
+          {loggedIn ? (
+            <ul className="navbar-nav">
+              <li className="nav-item">
+                <Link
+                  className="nav-link"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                >
+                  Logout
+                </Link>
+              </li>
+            </ul>
+          ) : (
+            <ul className="navbar-nav">
+              <li className="nav-item">
+                <Link className="nav-link" to="/register">
+                  Register
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/login">
+                  Login
+                </Link>
+              </li>
+            </ul>
+          )}
+        </div>
+      </nav>
+    </div>
+  );
+};
+
+
+// ./pages/Home.jsx
+import React from "react";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+
+export const Home = () => {
+  const loggedIn = !!useSelector((state) => state.profileReducer.user._id);
+  
+  return (
+    <div className="container">
+      <div className="h2">Welcome to HSMM Stackoverflow</div>
+      {loggedIn ? (
+        <Link className="btn btn-primary" to={"/users"}>
+          Get All Users
+        </Link>
+      ) : (
+        <Link className="btn btn-primary" to={"/login"}>
+          Login
+        </Link>
+      )}
+    </div>
+  );
+};
+
+
+// ./pages/Login.jsx
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, Navigate } from "react-router-dom";
+import { addProfile } from "../stateManagement/profileSlice";
+import { API_BASE_URL } from "../api/config";
+
+export const Login = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { user, loading } = useSelector((state) => state.profileReducer);
+  if (loading) return <div className="alert alert-info">Loading...</div>;
+  const loggedIn = !!user._id;
+  const handleLogin = (e) => {
+    e.preventDefault();
+    fetch(`${API_BASE_URL}/auth/login`, {
+      method: "POST",
+      credentials: "include",
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Login failed: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((json) => {
+        dispatch(addProfile(json.user));
+        navigate("/");
+      })
+      .catch((err) => {
+        console.log(err);
+        navigate("/login", { replace: true });
+      });
+  };
+  return loggedIn ? (
+    <Navigate to="/" replace />
+  ) : (
+    <div className="d-flex justify-content-center">
+      <form onSubmit={handleLogin}>
+        <div className="container mt-3 row">
+          <div className="form-group col-6">
+            <label className="ms-2" htmlFor="regFormEmail">
+              Email address
+            </label>
+            <input
+              type="email"
+              className="form-control mb-2"
+              id="regFormEmail"
+              placeholder="Enter your email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="form-group col-6">
+            <label className="ms-2" htmlFor="regFormPassword">
+              Password
+            </label>
+            <input
+              type="password"
+              className="form-control mb-2"
+              id="regFormPassword"
+              placeholder="Enter your strong password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <div className="col-12 d-flex justify-content-end">
+            <button type="submit" className="btn btn-primary">
+              Submit
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+
+// ./pages/Register.jsx
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Navigate, useNavigate } from "react-router-dom";
+import { addProfile } from "../stateManagement/profileSlice";
+import { API_BASE_URL } from "../api/config";
+
+export const Register = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [age, setAge] = useState("");
+  const { user, loading } = useSelector((state) => state.profileReducer);
+  if (loading) return <div className="alert alert-info">Loading...</div>;
+  const loggedIn = !!user._id;
+  const registerUser = (e) => {
+    e.preventDefault();
+    console.log("Submitted");
+    fetch(`${API_BASE_URL}/auth/register`, {
+      method: "POST",
+      credentials: "include",
+      body: JSON.stringify({
+        name: name,
+        email: email,
+        password: password,
+        age: age,
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Login failed: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((json) => {
+        dispatch(addProfile(json.user));
+        navigate("/");
+      })
+      .catch((err) => {
+        console.log(err);
+        navigate("/register", { replace: true });
+      });
+  };
+  return loggedIn ? (
+    <Navigate to="/" replace />
+  ) : (
+    <div className="d-flex justify-content-center">
+      <form onSubmit={registerUser}>
+        <div className="container mt-3 row">
+          <div className="form-group col-6">
+            <label className="ms-2" htmlFor="regFormName">
+              Name
+            </label>
+            <input
+              type="text"
+              className="form-control mb-2"
+              id="regFormName"
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div className="form-group col-6">
+            <label className="ms-2" htmlFor="regFormEmail">
+              Email address
+            </label>
+            <input
+              type="email"
+              className="form-control mb-2"
+              id="regFormEmail"
+              placeholder="Enter your email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="form-group col-6">
+            <label className="ms-2" htmlFor="regFormPassword">
+              Password
+            </label>
+            <input
+              type="password"
+              className="form-control mb-2"
+              id="regFormPassword"
+              placeholder="Create a strong password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <div className="form-group col-6">
+            <label className="ms-2" htmlFor="regFormAge">
+              Age
+            </label>
+            <input
+              type="number"
+              className="form-control mb-2"
+              id="regFormAge"
+              placeholder="Enter your age"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+            />
+          </div>
+          <div className="col-12 d-flex justify-content-end">
+            <button type="submit" className="btn btn-primary">
+              Submit
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+
+// ./pages/Users.jsx
+import React from "react";
+import { GetAllUsers } from "../components/GetAllUsers";
+
+export const Users = () => {
+  return (
+    <div className="container">
+      <div className="h2">All Users</div>
+      <GetAllUsers />
+    </div>
+  );
+};
+
+
+// ./stateManagement/store.js
+import { configureStore } from "@reduxjs/toolkit";
+import profileSliceReducer from "./profileSlice";
+import usersSliceReducer from "./usersSlice";
+
+export const store = configureStore({
+  reducer: {
+    profileReducer: profileSliceReducer,
+    usersReducer: usersSliceReducer,
+  },
+});
+
+
+// ./stateManagement/profileSlice.js
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { API_BASE_URL } from "../api/config";
+
+export const fetchProfile = createAsyncThunk(
+  "profile/fetch",
+  async ({ signal }, thunkAPI) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth`, {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-type": "application/json; charset=UTF-8" },
+        signal,
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch profile: ${res.status}`);
+      }
+      return await res.json();
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);
+
+const profileSlice = createSlice({
+  name: "profileSlice",
+  initialState: {
+    user: {},
+    loading: true,
+    error: null,
+  },
+  reducers: {
+    addProfile(state, action) {
+      state.user = action.payload || {};
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchProfile.pending, (state /*, action*/) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(fetchProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch users";
+      });
+  },
+});
+
+export const { addProfile } = profileSlice.actions;
+export default profileSlice.reducer;
+
+
+// ./stateManagement/usersSlice.js
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { API_BASE_URL } from "../api/config";
+
+export const fetchUsers = createAsyncThunk(
+  "users/fetch",
+  async (_, thunkAPI) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/users`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch users: ${res.status}`);
+      }
+      return await res.json();
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);
+
+const usersSlice = createSlice({
+  name: "usersSlice",
+  initialState: {
+    users: [],
+    loading: true,
+    error: null,
+  },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUsers.pending, (state /*, action*/) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUsers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.users = action.payload;
+      })
+      .addCase(fetchUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch users";
+      });
+  },
+});
+
+export default usersSlice.reducer;
+
+
+// ./App.jsx
+import React from "react";
+import { Navbar } from "./components/Navbar";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Provider } from "react-redux";
+import { store } from "./stateManagement/store";
+import { Home } from "./pages/Home";
+import { Register } from "./pages/Register";
+import { Login } from "./pages/Login";
+import { Users } from "./pages/Users";
+import { ProtectedRoutes } from "./ProtectedRoutes";
+
+function App() {
+  return (
+    <>
+      <Provider store={store}>
+        <Router>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+
+            {/* Protected routes below */}
+            <Route element={<ProtectedRoutes />}>
+              <Route path="/users" element={<Users />} />
+            </Route>
+          </Routes>
+        </Router>
+      </Provider>
+    </>
+  );
+}
+
+export default App;
+
+
+// ./ProtectedRoutes.jsx
+import { useSelector } from "react-redux";
+import { Navigate, Outlet } from "react-router-dom";
+
+export const ProtectedRoutes = () => {
+  const { user, loading } = useSelector((store) => store.profileReducer);
+  if (loading) return <div className="alert alert-info">Loading...</div>;
+  return user._id ? <Outlet /> : <Navigate to="/" />;
+};

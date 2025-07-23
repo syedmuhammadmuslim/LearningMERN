@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { API_BASE_URL } from "../../api/config";
+import { API_BASE_URL } from "../api/config";
 
 export const fetchUsers = createAsyncThunk(
   "users/fetch",
@@ -13,7 +13,7 @@ export const fetchUsers = createAsyncThunk(
         },
       });
       if (!res.ok) {
-        throw new Error("Unauthorized");
+        throw new Error(`Failed to fetch users: ${res.status}`);
       }
       return await res.json();
     } catch (err) {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Navigate } from "react-router-dom";
 import { addProfile } from "../stateManagement/profileSlice";
-import { API_BASE_URL } from "../../api/config";
+import { API_BASE_URL } from "../api/config";
 
 export const Login = () => {
   const dispatch = useDispatch();
@@ -25,14 +25,19 @@ export const Login = () => {
         "Content-type": "application/json; charset=UTF-8",
       },
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Login failed: ${response.status}`);
+        }
+        return response.json();
+      })
       .then((json) => {
         dispatch(addProfile(json.user));
         navigate("/");
       })
       .catch((err) => {
         console.log(err);
-        navigate("/");
+        navigate("/login", { replace: true });
       });
   };
   return loggedIn ? (

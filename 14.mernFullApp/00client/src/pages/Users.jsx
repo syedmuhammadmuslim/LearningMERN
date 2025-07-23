@@ -1,5 +1,4 @@
 import React from "react";
-// import { useSelector } from "react-redux";
 import { GetAllUsers } from "../components/GetAllUsers";
 
 export const Users = () => {

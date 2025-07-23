@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
 import { addProfile } from "../stateManagement/profileSlice";
-import { API_BASE_URL } from "../../api/config";
+import { API_BASE_URL } from "../api/config";
 
 export const Register = () => {
   const dispatch = useDispatch();
@@ -16,7 +16,6 @@ export const Register = () => {
   const loggedIn = !!user._id;
   const registerUser = (e) => {
     e.preventDefault();
-    console.log("Submitted");
     fetch(`${API_BASE_URL}/auth/register`, {
       method: "POST",
       credentials: "include",
@@ -24,19 +23,25 @@ export const Register = () => {
         name: name,
         email: email,
         password: password,
+        age: age,
       }),
       headers: {
         "Content-type": "application/json; charset=UTF-8",
       },
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Login failed: ${response.status}`);
+        }
+        return response.json();
+      })
       .then((json) => {
         dispatch(addProfile(json.user));
         navigate("/");
       })
       .catch((err) => {
         console.log(err);
-        navigate("/");
+        navigate("/register", { replace: true });
       });
   };
   return loggedIn ? (

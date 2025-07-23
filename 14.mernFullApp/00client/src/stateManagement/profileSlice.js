@@ -1,19 +1,18 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { API_BASE_URL } from "../../api/config";
+import { API_BASE_URL } from "../api/config";
 
 export const fetchProfile = createAsyncThunk(
   "profile/fetch",
-  async (_, thunkAPI) => {
+  async ({ signal }, thunkAPI) => {
     try {
       const res = await fetch(`${API_BASE_URL}/auth`, {
         method: "GET",
         credentials: "include",
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
+        headers: { "Content-type": "application/json; charset=UTF-8" },
+        signal,
       });
       if (!res.ok) {
-        throw new Error("Unauthorized");
+        throw new Error(`Failed to fetch profile: ${res.status}`);
       }
       return await res.json();
     } catch (err) {
@@ -41,8 +40,8 @@ const profileSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchProfile.fulfilled, (state, action) => {
-        state.loading = false;
         state.user = action.payload;
+        state.loading = false;
       })
       .addCase(fetchProfile.rejected, (state, action) => {
         state.loading = false;

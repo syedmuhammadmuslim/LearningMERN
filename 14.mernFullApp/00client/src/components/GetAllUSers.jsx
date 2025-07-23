@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { fetchUsers } from "../stateManagement/usersSlice";
 import { useDispatch, useSelector } from "react-redux";
+import DOMPurify from "dompurify";
 
 export const GetAllUsers = () => {
   const dispatch = useDispatch();
@@ -20,7 +21,7 @@ export const GetAllUsers = () => {
           users.map((user) => {
             return (
               <li key={user._id} className="list-group-item">
-                {user.name}
+                {DOMPurify.sanitize(user.name)}
               </li>
             );
           })

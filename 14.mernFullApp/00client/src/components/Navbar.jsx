@@ -1,34 +1,50 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { addProfile, fetchProfile } from "../stateManagement/profileSlice";
-import { API_BASE_URL } from "../../api/config.js";
+import { API_BASE_URL } from "../api/config.js";
 
 export const Navbar = () => {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(fetchProfile());
-  }, [dispatch]);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { user, loading } = useSelector((store) => store.profileReducer);
   const loggedIn = !!user._id;
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const controller = new AbortController();
+    dispatch(fetchProfile({ signal: controller.signal }));
+    return () => controller.abort();
+  }, [dispatch]);
 
   if (loading) {
     return <div className="alert alert-info">Loading...</div>;
   }
+
   const handleLogout = (e) => {
     e.preventDefault();
+    setIsLoggingOut(true);
     fetch(`${API_BASE_URL}/auth/logout`, {
       method: "POST",
       credentials: "include",
-    }).then(() => {
-      dispatch(addProfile({}));
-      return;
-    });
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Logout failed");
+        }
+        dispatch(addProfile({}));
+        navigate("/");
+      })
+      .catch((err) => {
+        console.log(err);
+        alert(err.message);
+      })
+      .finally(() => setIsLoggingOut(false));
   };
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <Link className="navbar-brand" to="/">
+        <Link className="navbar-brand ms-2" to="/">
           HSMM Stack Overflow
         </Link>
         <button
@@ -53,28 +69,33 @@ export const Navbar = () => {
               </Link>
             </li>
           </ul>
-          {loggedIn ? (
-            <ul className="navbar-nav">
+
+          <ul className="navbar-nav me-2">
+            {loggedIn ? (
               <li className="nav-item">
-                <Link className="nav-link" onClick={handleLogout}>
+                <button
+                  className="nav-link btn btn-link"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                >
                   Logout
-                </Link>
+                </button>
               </li>
-            </ul>
-          ) : (
-            <ul className="navbar-nav">
-              <li className="nav-item">
-                <Link className="nav-link" to="/register">
-                  Register
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/login">
-                  Login
-                </Link>
-              </li>
-            </ul>
-          )}
+            ) : (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/register">
+                    Register
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/login">
+                    Login
+                  </Link>
+                </li>
+              </>
+            )}
+          </ul>
         </div>
       </nav>
     </div>

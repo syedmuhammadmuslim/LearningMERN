@@ -1,3 +1,4 @@
+import React from "react";
 import { Navbar } from "./components/Navbar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Provider } from "react-redux";
@@ -15,13 +16,13 @@ function App() {
         <Router>
           <Navbar />
           <Routes>
-            <Route exact path="/" element={<Home />} />
-            <Route exact path="/register" element={<Register />} />
-            <Route exact path="/login" element={<Login />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
 
             {/* Protected routes below */}
             <Route element={<ProtectedRoutes />}>
-              <Route exact path="/users" element={<Users />} />
+              <Route path="/users" element={<Users />} />
             </Route>
           </Routes>
         </Router>
